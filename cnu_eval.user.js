@@ -1,9 +1,9 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
-// @namespace    https://github.com/your-username/cnu-eval
+// @namespace    https://github.com/louqingjie/cnu_eval
 // @version      2.1
-// @description  一键自动完成首都师范大学量化评教，支持自定义分数，全自动批量处理
-// @author       你的名字
+// @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
+// @author       louqingjie
 // @license      MIT
 // @match        https://urp.cnu.edu.cn/eams/quality/*
 // @icon         https://urp.cnu.edu.cn/favicon.ico
@@ -13,10 +13,8 @@
 // @grant        GM_setValue
 // @grant        GM_deleteValue
 // @run-at       document-end
-// @supportURL   https://github.com/your-username/cnu-eval/issues
-// @homepageURL  https://github.com/your-username/cnu-eval
-// @downloadURL  https://greasyfork.org/scripts/xxxxx/cnu-eval.user.js
-// @updateURL    https://greasyfork.org/scripts/xxxxx/cnu-eval.meta.js
+// @supportURL   https://github.com/louqingjie/cnu_eval/issues
+// @homepageURL  https://github.com/louqingjie/cnu_eval
 // ==/UserScript==
 
 (function () {

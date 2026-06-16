@@ -1,7 +1,7 @@
 # 首都师范大学 量化评教 自动评教 🎓
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.1-blue.svg)](https://greasyfork.org/)
+[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.1-blue.svg)](https://greasyfork.org/scripts/)[![](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教，支持自定义评分、批量逐页处理。
 
@@ -24,7 +24,7 @@
 
 ### 安装脚本
 - **方法一**：从 Greasy Fork 安装（推荐）
-  - 访问 [Greasy Fork 脚本页面]() → 点击「安装此脚本」
+  - 访问 [Greasy Fork 脚本页面](https://greasyfork.org/) → 搜索「首都师范大学 量化评教」→ 点击「安装此脚本」
 - **方法二**：手动安装
   - 下载 `cnu_eval.user.js` 文件
   - 拖拽到浏览器中，Tampermonkey 会自动识别并提示安装
