@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.2
+// @version      2.3
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -616,37 +616,101 @@
             }
             setTimeout(createBatchPanel, 800);
         } else if (url.includes("homeExt")) {
-            // 首页 - 评教在 iframe 中加载，提示用户直接打开评教页面
-            addHomePageGuide();
-            // 同时尝试在 iframe 中注入（如果已加载）
+            // 首页 - 直接显示评教面板，点击后打开新标签页执行
+            setTimeout(createHomePanel, 800);
             tryInjectIntoIframe();
         }
     }
 
-    /** 首页：添加浮动引导按钮 */
-    function addHomePageGuide() {
-        const guide = document.createElement("div");
-        guide.id = "cnu-home-guide";
-        guide.style.cssText =
-            "position:fixed;bottom:30px;right:30px;z-index:999999;" +
-            "background:#1a73e8;color:#fff;border:none;border-radius:50px;" +
-            "padding:14px 24px;font-size:15px;font-weight:bold;cursor:pointer;" +
-            "box-shadow:0 6px 20px rgba(26,115,232,0.4);" +
-            "font-family:Microsoft YaHei,sans-serif;" +
-            "display:flex;align-items:center;gap:8px;transition:all 0.2s;";
-        guide.innerHTML = "📊 打开量化评教";
-        guide.onmouseover = () => { guide.style.background = "#1557b0"; guide.style.transform = "translateY(-2px)"; };
-        guide.onmouseout = () => { guide.style.background = "#1a73e8"; guide.style.transform = ""; };
-        guide.onclick = () => {
+    /** 首页：直接显示完整的评教配置面板 */
+    function createHomePanel() {
+        const panel = document.createElement("div");
+        panel.id = "cnu-panel";
+        const cfg = loadConfig();
+        const pool = cfg.commentPool || DEFAULTS.commentPool;
+        panel.innerHTML = `
+            <button class="close-btn" id="cnu-close">✕</button>
+            <h3>📊 量化评教</h3>
+            <div class="row">
+                <label>教学评分</label>
+                <select id="cnu-s-teach">
+                    <option value="5">很好</option>
+                    <option value="4">好</option>
+                    <option value="3">较好</option>
+                    <option value="2">一般</option>
+                    <option value="1">较差</option>
+                </select>
+            </div>
+            <div class="row">
+                <label>课程难度</label>
+                <select id="cnu-s-diff">
+                    <option value="3">适中</option>
+                    <option value="4">较深</option>
+                    <option value="5">过深</option>
+                    <option value="2">较浅</option>
+                    <option value="1">过浅</option>
+                </select>
+            </div>
+            <div class="row">
+                <label>满意度</label>
+                <select id="cnu-s-sat">
+                    <option value="5">很满意</option>
+                    <option value="4">满意</option>
+                    <option value="3">基本满意</option>
+                    <option value="2">不满意</option>
+                    <option value="1">很不满意</option>
+                </select>
+            </div>
+            <div class="row" style="justify-content:flex-start !important;gap:6px !important;">
+                <input type="checkbox" id="cnu-s-autosubmit" checked>
+                <label for="cnu-s-autosubmit">自动提交</label>
+            </div>
+            <div class="row" style="justify-content:flex-start !important;gap:6px !important;">
+                <input type="checkbox" id="cnu-s-random">
+                <label for="cnu-s-random">随机评语</label>
+                <span id="cnu-pool-count" style="font-size:11px;color:#999;cursor:pointer;"
+                      title="点击管理评语池">📝 ${pool.length}条</span>
+            </div>
+            <button class="btn btn-primary" id="cnu-home-start-btn">
+                🚀 打开评教并开始
+            </button>
+            <div class="status" id="cnu-status">💡 点击按钮将在新标签页打开评教</div>
+        `;
+        document.body.appendChild(panel);
+
+        // 恢复配置
+        const teachSel = document.getElementById("cnu-s-teach");
+        const diffSel = document.getElementById("cnu-s-diff");
+        const satSel = document.getElementById("cnu-s-sat");
+        const autoCb = document.getElementById("cnu-s-autosubmit");
+        const randomCb = document.getElementById("cnu-s-random");
+        const poolCount = document.getElementById("cnu-pool-count");
+        if (teachSel) teachSel.value = cfg.teachingScore;
+        if (diffSel) diffSel.value = cfg.contentDifficulty;
+        if (satSel) satSel.value = cfg.satisfactionScore;
+        if (autoCb) autoCb.checked = cfg.autoSubmit;
+        if (randomCb) randomCb.checked = cfg.useRandomComment !== false;
+        if (poolCount) poolCount.textContent = `📝 ${pool.length}条`;
+        if (poolCount) poolCount.onclick = () => showCommentManager();
+
+        document.getElementById("cnu-close").onclick = () => panel.remove();
+
+        document.getElementById("cnu-home-start-btn").onclick = () => {
+            // 保存配置
+            const saved = loadConfig();
+            const config = {
+                teachingScore: parseInt(document.getElementById("cnu-s-teach").value),
+                contentDifficulty: parseInt(document.getElementById("cnu-s-diff").value),
+                satisfactionScore: parseInt(document.getElementById("cnu-s-sat").value),
+                autoSubmit: document.getElementById("cnu-s-autosubmit").checked,
+                useRandomComment: document.getElementById("cnu-s-random").checked,
+                improvementSuggestion: DEFAULTS.improvementSuggestion,
+                commentPool: saved.commentPool || DEFAULTS.commentPool,
+            };
+            saveConfig(config);
+            // 在新标签页打开评教列表，脚本会自动检测配置并开始
             window.open("https://urp.cnu.edu.cn/eams/quality/stdEvaluate.action", "_blank");
         };
-        document.body.appendChild(guide);
-
-        // 5秒后自动隐藏底部提示
-        setTimeout(() => {
-            const existing = document.getElementById("cnu-home-guide");
-            if (existing && !document.getElementById("cnu-panel")) existing.remove();
-        }, 15000);
     }
 
     /** 尝试在 iframe 中注入评教面板 */
