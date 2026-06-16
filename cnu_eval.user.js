@@ -15,6 +15,8 @@
 // @run-at       document-end
 // @supportURL   https://github.com/louqingjie/cnu_eval/issues
 // @homepageURL  https://github.com/louqingjie/cnu_eval
+// @downloadURL  https://update.greasyfork.org/scripts/583109/%E9%A6%96%E9%83%BD%E5%B8%88%E8%8C%83%E5%A4%A7%E5%AD%A6%20%E9%87%8F%E5%8C%96%E8%AF%84%E6%95%99%20%E8%87%AA%E5%8A%A8%E8%AF%84%E6%95%99.user.js
+// @updateURL    https://update.greasyfork.org/scripts/583109/%E9%A6%96%E9%83%BD%E5%B8%88%E8%8C%83%E5%A4%A7%E5%AD%A6%20%E9%87%8F%E5%8C%96%E8%AF%84%E6%95%99%20%E8%87%AA%E5%8A%A8%E8%AF%84%E6%95%99.meta.js
 // ==/UserScript==
 
 (function () {
