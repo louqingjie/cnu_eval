@@ -1,8 +1,8 @@
 # 首都师范大学 量化评教 自动评教 🎓
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.1-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
-[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.1-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
+[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.2-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
+[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.2-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
 [![GitHub Stars](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教，支持自定义评分、批量逐页处理。
@@ -73,6 +73,12 @@ cnu-eval/
 - 基于 RequireJS 页面架构开发，兼容教务系统的 AMD 模块加载
 
 ## 📝 更新日志
+
+### v2.2
+- 新增首页（`homeExt.action`）支持，浮动按钮直接打开评教
+- 新增自定义评语池，每次随机选取
+- 优化 iframe 内嵌兼容性
+- 修复 `stdEvaluate!innerIndex` 路径识别
 
 ### v2.1
 - 优化提交按钮定位，使用 `id="sub"` 精准查找

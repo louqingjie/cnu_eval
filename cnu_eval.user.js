@@ -1,11 +1,12 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.1
+// @version      2.2
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
 // @match        https://urp.cnu.edu.cn/eams/quality/*
+// @match        https://urp.cnu.edu.cn/eams/homeExt*
 // @icon         https://urp.cnu.edu.cn/favicon.ico
 // @grant        GM_addStyle
 // @grant        GM_registerMenuCommand
@@ -598,8 +599,10 @@
         const url = window.location.href;
 
         if (url.includes("stdEvaluate!answer.action")) {
+            // 评教填写页面
             handleEvalPage();
-        } else if (url.includes("stdEvaluate.action") || url.includes("stdEvaluate!main")) {
+        } else if (url.includes("stdEvaluate.action") || url.includes("stdEvaluate!main") || url.includes("stdEvaluate!innerIndex")) {
+            // 评教列表页面（直接访问或在 iframe 中）
             const batchRaw = localStorage.getItem("cnu_batch_eval");
             if (batchRaw) {
                 const state = JSON.parse(batchRaw);
@@ -612,7 +615,73 @@
                 return;
             }
             setTimeout(createBatchPanel, 800);
+        } else if (url.includes("homeExt")) {
+            // 首页 - 评教在 iframe 中加载，提示用户直接打开评教页面
+            addHomePageGuide();
+            // 同时尝试在 iframe 中注入（如果已加载）
+            tryInjectIntoIframe();
         }
+    }
+
+    /** 首页：添加浮动引导按钮 */
+    function addHomePageGuide() {
+        const guide = document.createElement("div");
+        guide.id = "cnu-home-guide";
+        guide.style.cssText =
+            "position:fixed;bottom:30px;right:30px;z-index:999999;" +
+            "background:#1a73e8;color:#fff;border:none;border-radius:50px;" +
+            "padding:14px 24px;font-size:15px;font-weight:bold;cursor:pointer;" +
+            "box-shadow:0 6px 20px rgba(26,115,232,0.4);" +
+            "font-family:Microsoft YaHei,sans-serif;" +
+            "display:flex;align-items:center;gap:8px;transition:all 0.2s;";
+        guide.innerHTML = "📊 打开量化评教";
+        guide.onmouseover = () => { guide.style.background = "#1557b0"; guide.style.transform = "translateY(-2px)"; };
+        guide.onmouseout = () => { guide.style.background = "#1a73e8"; guide.style.transform = ""; };
+        guide.onclick = () => {
+            window.open("https://urp.cnu.edu.cn/eams/quality/stdEvaluate.action", "_blank");
+        };
+        document.body.appendChild(guide);
+
+        // 5秒后自动隐藏底部提示
+        setTimeout(() => {
+            const existing = document.getElementById("cnu-home-guide");
+            if (existing && !document.getElementById("cnu-panel")) existing.remove();
+        }, 15000);
+    }
+
+    /** 尝试在 iframe 中注入评教面板 */
+    function tryInjectIntoIframe() {
+        const iframes = document.querySelectorAll("iframe");
+        iframes.forEach((iframe) => {
+            try {
+                const src = iframe.src || iframe.getAttribute("src") || "";
+                if (!src.includes("quality") && !src.includes("stdEvaluate")) return;
+                // iframe 已加载且同源，尝试注入
+                const iframeDoc = iframe.contentDocument || iframe.contentWindow?.document;
+                if (iframeDoc && iframeDoc.readyState === "complete") {
+                    // 让 iframe 中的脚本来处理（脚本会通过 @match quality/* 自动运行）
+                }
+            } catch (e) {
+                // 跨域 iframe，忽略
+            }
+        });
+        // 每 2 秒检查一次是否有新 iframe 加载
+        let checks = 0;
+        const iv = setInterval(() => {
+            checks++;
+            if (checks > 15) { clearInterval(iv); return; } // 最多等30秒
+            const frames = document.querySelectorAll("iframe");
+            let found = false;
+            frames.forEach((iframe) => {
+                try {
+                    const src = iframe.src || iframe.getAttribute("src") || "";
+                    if (src.includes("quality") || src.includes("stdEvaluate")) {
+                        found = true;
+                    }
+                } catch (e) { }
+            });
+            if (found) clearInterval(iv);
+        }, 2000);
     }
 
     function showCompletion(total) {
