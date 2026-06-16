@@ -2,6 +2,7 @@
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 [![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.1-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
+[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.1-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
 [![GitHub Stars](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教，支持自定义评分、批量逐页处理。
@@ -24,11 +25,12 @@
 1. 浏览器安装 [Tampermonkey](https://www.tampermonkey.net/) 扩展（Chrome / Edge / Firefox 均支持）
 
 ### 安装脚本
-- **方法一**：从 Greasy Fork 安装（推荐）
-  - [点此直接安装](https://greasyfork.org/zh-CN/scripts/583109) → 点击「安装此脚本」
-- **方法二**：手动安装
-  - 下载 `cnu_eval.user.js` 文件
-  - 拖拽到浏览器中，Tampermonkey 会自动识别并提示安装
+
+支持 Tampermonkey / Violentmonkey / ScriptCat 等主流用户脚本管理器。
+
+- **Greasy Fork**（推荐）：[点此安装](https://greasyfork.org/zh-CN/scripts/583109)
+- **ScriptCat**（脚本猫）：[点此安装](https://scriptcat.org/zh-CN/script-show-page/6690)
+- **手动安装**：下载 `cnu_eval.user.js` 拖拽到浏览器中
 
 ## 🚀 使用方法
 
