@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.3
+// @version      2.4
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -545,7 +545,22 @@
             : "⭐ 一键评教（随机评语）";
         document.body.appendChild(btn);
 
+        // 创建取消按钮（初始隐藏）
+        const cancelBtn = document.createElement("button");
+        cancelBtn.id = "cnu-cancel-btn";
+        cancelBtn.textContent = "✕ 取消提交";
+        cancelBtn.style.cssText =
+            "position:fixed;top:60px;right:12px;z-index:99999;" +
+            "padding:6px 14px;background:#d93025;color:#fff;border:none;border-radius:6px;" +
+            "font-size:13px;cursor:pointer;display:none;font-family:Microsoft YaHei,sans-serif;" +
+            "box-shadow:0 2px 8px rgba(0,0,0,0.2);";
+        document.body.appendChild(cancelBtn);
+
+        let countdownTimer = null;
+        let cancelled = false;
+
         btn.onclick = function () {
+            // 先填表
             const result = fillEvaluation(config);
             if (!result.success) {
                 btn.textContent = "❌ " + result.reason;
@@ -554,37 +569,56 @@
                 return;
             }
 
-            if (autoSubmit) {
-                const clicked = clickSubmit();
-                btn.textContent = clicked ? "✅ 已提交！" : "⚠️ 请手动点击提交";
-                btn.style.background = "#0f9d58";
-                btn.disabled = true;
+            // 显示评语内容
+            const comment = result.commentUsed || "";
+            btn.textContent = `⏳ 即将提交 (3s)...`;
+            btn.style.background = "#f9ab00";
+            btn.disabled = true;
+            cancelBtn.style.display = "block";
+            cancelled = false;
 
-                if (isBatch && clicked) {
-                    // confirm 已被 hijackConfirm 自动拦截，直接继续下一个
-                    setTimeout(() => {
-                        const state = JSON.parse(localStorage.getItem("cnu_batch_eval"));
-                        if (state) {
-                            state.current++;
-                            if (state.current < state.total) {
-                                localStorage.setItem("cnu_batch_eval", JSON.stringify(state));
-                                setTimeout(() => {
-                                    window.location.href = state.urls[state.current];
-                                }, 1500);
-                            } else {
-                                localStorage.removeItem("cnu_batch_eval");
-                                setTimeout(() => {
-                                    window.location.href = "https://urp.cnu.edu.cn/eams/quality/stdEvaluate.action";
-                                }, 3000);
-                            }
-                        }
-                    }, 2000);
+            let remain = 3;
+            countdownTimer = setInterval(() => {
+                remain--;
+                btn.textContent = `⏳ 即将提交 (${remain}s)...`;
+                if (remain <= 0) {
+                    clearInterval(countdownTimer);
+                    countdownTimer = null;
+                    doSubmit();
                 }
-            } else {
-                btn.textContent = "✅ 已填写完毕，请检查后提交";
-                btn.style.background = "#0f9d58";
+            }, 1000);
+
+            function doSubmit() {
+                if (cancelled) return;
+                cancelBtn.style.display = "none";
+
+                // 提交前更新批量状态（提交后页面会重新加载，计时器会丢失）
+                if (isBatch) {
+                    const state = JSON.parse(localStorage.getItem("cnu_batch_eval"));
+                    if (state) {
+                        state.current++;
+                        localStorage.setItem("cnu_batch_eval", JSON.stringify(state));
+                        localStorage.setItem("cnu_batch_advance", "true");
+                    }
+                }
+
+                const clicked = clickSubmit();
+                btn.textContent = clicked ? "✅ 已提交！" : "⚠️ 请手动提交";
+                btn.style.background = clicked ? "#0f9d58" : "#d93025";
                 btn.disabled = true;
             }
+        };
+
+        cancelBtn.onclick = function () {
+            cancelled = true;
+            if (countdownTimer) {
+                clearInterval(countdownTimer);
+                countdownTimer = null;
+            }
+            btn.textContent = "⏹ 已取消，可检查后手动提交";
+            btn.style.background = "#666";
+            btn.disabled = true;
+            cancelBtn.style.display = "none";
         };
 
         // 批量模式自动点击
@@ -598,11 +632,37 @@
     function init() {
         const url = window.location.href;
 
+        if (url.includes("stdEvaluate!finishAnswer")) {
+            // 提交后的过渡页面，无需处理，等重定向到列表页即可
+            return;
+        }
+
         if (url.includes("stdEvaluate!answer.action")) {
             // 评教填写页面
             handleEvalPage();
         } else if (url.includes("stdEvaluate.action") || url.includes("stdEvaluate!main") || url.includes("stdEvaluate!innerIndex")) {
             // 评教列表页面（直接访问或在 iframe 中）
+
+            // 检测是否刚从评教页面提交返回，需要继续批量处理
+            const advance = localStorage.getItem("cnu_batch_advance");
+            if (advance === "true") {
+                localStorage.removeItem("cnu_batch_advance");
+                const batchRaw = localStorage.getItem("cnu_batch_eval");
+                if (batchRaw) {
+                    const state = JSON.parse(batchRaw);
+                    if (state.current < state.total) {
+                        // 还有下一个，直接跳转
+                        window.location.href = state.urls[state.current];
+                        return;
+                    } else {
+                        // 全部完成
+                        localStorage.removeItem("cnu_batch_eval");
+                        setTimeout(() => showCompletion(state.total), 500);
+                        return;
+                    }
+                }
+            }
+
             const batchRaw = localStorage.getItem("cnu_batch_eval");
             if (batchRaw) {
                 const state = JSON.parse(batchRaw);
