@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.7
+// @version      2.8
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -681,7 +681,8 @@
             }
             setTimeout(createBatchPanel, 800);
         } else if (url.includes("homeExt")) {
-            // 首页 - 直接显示评教面板，点击后打开新标签页执行
+            // 首页 - 仅在最顶层窗口运行，iframe 内不创建面板
+            if (window.top !== window.self) return;
             setTimeout(createHomePanel, 800);
             tryInjectIntoIframe();
         }

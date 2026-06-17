@@ -1,8 +1,8 @@
 # 首都师范大学 量化评教 自动评教 🎓
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.7-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
-[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.7-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
+[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.8-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
+[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.8-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
 [![GitHub Stars](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教。
