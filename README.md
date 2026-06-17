@@ -1,8 +1,8 @@
 # 首都师范大学 量化评教 自动评教 🎓
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.10-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
-[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.10-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
+[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.11-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
+[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.11-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
 [![GitHub Stars](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教。
@@ -87,6 +87,9 @@ cnu-eval/
 - 基于 RequireJS 页面架构开发，兼容教务系统的 AMD 模块加载
 
 ## 📝 更新日志
+
+### v2.11
+- 修复批量提交时 confirm 弹窗无法自动消除（劫持改为 beforeunload 清理，不再限时 5 秒）
 
 ### v2.10
 - 修复 createBatchPanel 报错 `Cannot access 'cfg' before initialization`

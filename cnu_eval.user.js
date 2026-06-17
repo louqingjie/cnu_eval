@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.10
+// @version      2.11
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -247,20 +247,26 @@
         return { success: true, commentUsed: t.length >= 1 ? t[0].value : "" };
     }
 
-    /** 拦截 window.confirm，自动返回 true，弹窗不会出现 */
+    /** 拦截 window.confirm，自动返回 true，持续到页面跳转 */
+    let _confirmHijackCleanup = null;
     function hijackConfirm() {
+        if (_confirmHijackCleanup) return; // 已在劫持中，无需重复
         const originalConfirm = window.confirm;
         window.confirm = () => true;
-        // 也给一层 setTimeout 保护，防止页面异步调用
+        // 定时保活，防止页面异步恢复
         const handler = setInterval(() => {
             if (window.confirm !== originalConfirm) return;
             window.confirm = () => true;
-        }, 100);
-        // 5秒后停止劫持，避免影响其他页面
-        setTimeout(() => {
+        }, 200);
+        // 页面离开时清理
+        const cleanup = () => {
             clearInterval(handler);
             window.confirm = originalConfirm;
-        }, 5000);
+            window.removeEventListener('beforeunload', cleanup);
+            _confirmHijackCleanup = null;
+        };
+        window.addEventListener('beforeunload', cleanup);
+        _confirmHijackCleanup = cleanup;
     }
 
     function clickSubmit() {
