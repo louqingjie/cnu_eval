@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.12
+// @version      2.13
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -24,9 +24,13 @@
 (function () {
     "use strict";
 
-    // ====== 立即劫持 confirm（必须在页面脚本执行前，否则页面已缓存原始 confirm） ======
-    const _originalConfirm = window.confirm;
-    window.confirm = () => true;
+    // ====== 立即劫持 confirm（Object.defineProperty 锁定，无法被覆盖） ======
+    Object.defineProperty(window, "confirm", {
+        get: () => () => true,
+        set: () => {},
+        configurable: true,
+        enumerable: true,
+    });
 
     // ==================== 配置（默认值） ====================
     const DEFAULTS = {
