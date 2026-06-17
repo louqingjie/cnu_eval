@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.15
+// @version      2.17
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -9,6 +9,7 @@
 // @match        https://urp.cnu.edu.cn/eams/homeExt*
 // @icon         https://urp.cnu.edu.cn/favicon.ico
 // @grant        GM_addStyle
+// @grant        unsafeWindow
 // @grant        GM_registerMenuCommand
 // @grant        GM_getValue
 // @grant        GM_setValue
@@ -24,38 +25,39 @@
 (function () {
     "use strict";
 
-    // ====== 立即劫持 + 持续保活 ======
-    const _hijack = () => { window.confirm = () => true; };
+    // ====== 立即劫持 + 持续保活（同时攻击 window 和 unsafeWindow） ======
+    const _hijack = () => {
+        window.confirm = () => true;
+        if (typeof unsafeWindow !== "undefined") unsafeWindow.confirm = () => true;
+    };
     _hijack();
     setInterval(_hijack, 50);
 
-    // 样式注入须等待 DOM（document-start 时 document.head 不可用）
+    // ==================== 配置（默认值） ====================
+    const DEFAULTS = {
+        teachingScore: 5,
+        contentDifficulty: 3,
+        satisfactionScore: 5,
+        autoSubmit: true,
+        improvementSuggestion: "无",
+        useRandomComment: true,
+        commentPool: [
+            "教学认真负责，讲解清晰，注重互动",
+            "课堂氛围活跃，老师善于引导学生思考",
+            "教学内容充实，重点突出，讲解透彻",
+            "老师备课充分，讲课富有激情，感染力强",
+            "注重理论与实践结合，教学效果显著",
+            "耐心解答学生问题，课后辅导及时到位",
+            "课程安排合理，循序渐进，易于理解",
+            "教学方法多样，善于运用案例教学",
+            "关心学生成长，既教书又育人",
+            "课堂管理规范，教学态度严谨认真",
+        ],
+    };
+
+    // ==================== 样式（延迟注入） ====================
     function _injectStyles() {
 
-        // ==================== 配置（默认值） ====================
-        const DEFAULTS = {
-            teachingScore: 5,     // 教学评分: 5=很好, 4=好, 3=较好, 2=一般, 1=较差
-            contentDifficulty: 3, // 课程难度: 3=适中, 2=较浅, 1=过浅, 4=较深, 5=过深
-            satisfactionScore: 5, // 满意度:   5=很满意, 4=满意, 3=基本满意, 2=不满意, 1=很不满意
-            autoSubmit: true,     // 是否自动提交
-            improvementSuggestion: "无",
-            useRandomComment: true, // 是否从评语池随机选取
-            // 评语池（每次评教随机选取一条填入）
-            commentPool: [
-                "教学认真负责，讲解清晰，注重互动",
-                "课堂氛围活跃，老师善于引导学生思考",
-                "教学内容充实，重点突出，讲解透彻",
-                "老师备课充分，讲课富有激情，感染力强",
-                "注重理论与实践结合，教学效果显著",
-                "耐心解答学生问题，课后辅导及时到位",
-                "课程安排合理，循序渐进，易于理解",
-                "教学方法多样，善于运用案例教学",
-                "关心学生成长，既教书又育人",
-                "课堂管理规范，教学态度严谨认真",
-            ],
-        };
-
-        // ==================== 样式 ====================
         GM_addStyle(`
         #cnu-panel {
             all: initial;
@@ -271,7 +273,8 @@
 
     /** confirm 已在脚本加载时全局劫持，此函数仅作保活 */
     function hijackConfirm() {
-        window.confirm = () => true; // 确保仍在劫持中
+        window.confirm = () => true;
+        if (typeof unsafeWindow !== "undefined") unsafeWindow.confirm = () => true;
     }
 
     function clickSubmit() {

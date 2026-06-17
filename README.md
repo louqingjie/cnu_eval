@@ -1,8 +1,8 @@
 # 首都师范大学 量化评教 自动评教 🎓
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.15-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
-[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.15-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
+[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.17-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
+[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.17-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
 [![GitHub Stars](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教。
@@ -87,6 +87,13 @@ cnu-eval/
 - 基于 RequireJS 页面架构开发，兼容教务系统的 AMD 模块加载
 
 ## 📝 更新日志
+
+### v2.17
+- confirm 劫持同时攻击 `unsafeWindow.confirm`（Tampermonkey 沙箱中 window ≠ 页面 window）
+- 新增 `@grant unsafeWindow`
+
+### v2.16
+- 修复 `DEFAULTS is not defined` 错误（v2.15 误将 DEFAULTS 放入内部作用域）
 
 ### v2.15
 - 修复 Edge 下脚本完全无法加载（`GM_addStyle` 在 `document-start` 时因 `document.head` 不存在而崩溃）
