@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.8
+// @version      2.9
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -670,7 +670,34 @@
 
             const batchRaw = localStorage.getItem("cnu_batch_eval");
             if (batchRaw) {
-                const state = JSON.parse(batchRaw);
+                // 验证批量数据是否仍然有效（URL 列表是否匹配当前待评教链接）
+                try {
+                    const state = JSON.parse(batchRaw);
+                    const currentLinks = new Set(
+                        getPendingLinks().map(a => a.href)
+                    );
+                    const staleUrls = state.urls.filter(u => !currentLinks.has(u));
+                    // 如果超过一半的 URL 已经失效（已评教或页面变化），清除过期状态
+                    if (staleUrls.length > state.urls.length / 2) {
+                        localStorage.removeItem("cnu_batch_eval");
+                        localStorage.removeItem("cnu_batch_advance");
+                    } else {
+                        // 过滤掉已失效的 URL
+                        state.urls = state.urls.filter(u => currentLinks.has(u));
+                        state.total = state.urls.length;
+                        if (state.current > state.total) state.current = state.total;
+                        localStorage.setItem("cnu_batch_eval", JSON.stringify(state));
+                    }
+                } catch (e) {
+                    localStorage.removeItem("cnu_batch_eval");
+                    localStorage.removeItem("cnu_batch_advance");
+                }
+            }
+
+            // 重新读取批量状态（可能已被清除）
+            const batchRaw2 = localStorage.getItem("cnu_batch_eval");
+            if (batchRaw2) {
+                const state = JSON.parse(batchRaw2);
                 if (state.current >= state.total) {
                     localStorage.removeItem("cnu_batch_eval");
                     setTimeout(() => showCompletion(state.total), 500);

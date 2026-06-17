@@ -1,8 +1,8 @@
 # 首都师范大学 量化评教 自动评教 🎓
 
 [![MIT License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
-[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.8-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
-[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.8-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
+[![Greasy Fork](https://img.shields.io/badge/Greasy%20Fork-v2.9-blue.svg)](https://greasyfork.org/zh-CN/scripts/583109)
+[![ScriptCat](https://img.shields.io/badge/ScriptCat-v2.9-orange.svg)](https://scriptcat.org/zh-CN/script-show-page/6690)
 [![GitHub Stars](https://img.shields.io/github/stars/louqingjie/cnu_eval?style=social)](https://github.com/louqingjie/cnu_eval)
 
 > 一个 Tampermonkey 用户脚本，一键自动完成首都师范大学教务系统的量化评教。
@@ -87,6 +87,13 @@ cnu-eval/
 - 基于 RequireJS 页面架构开发，兼容教务系统的 AMD 模块加载
 
 ## 📝 更新日志
+
+### v2.9
+- 修复评教列表页面板不显示（残留 localStorage 导致误跳转）
+- 新增批量状态有效性验证，自动清除过期数据
+
+### v2.8
+- 首页增加 `window.top !== window.self` 检查，防止 iframe 内重复创建面板
 
 ### v2.7
 - 新增 AGENTS.md AI 辅助配置文件
