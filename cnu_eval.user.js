@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.11
+// @version      2.12
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -13,7 +13,7 @@
 // @grant        GM_getValue
 // @grant        GM_setValue
 // @grant        GM_deleteValue
-// @run-at       document-end
+// @run-at       document-start
 // @supportURL   https://github.com/louqingjie/cnu_eval/issues
 // @homepageURL  https://github.com/louqingjie/cnu_eval
 // @downloadURL  https://update.greasyfork.org/scripts/583109/%E9%A6%96%E9%83%BD%E5%B8%88%E8%8C%83%E5%A4%A7%E5%AD%A6%20%E9%87%8F%E5%8C%96%E8%AF%84%E6%95%99%20%E8%87%AA%E5%8A%A8%E8%AF%84%E6%95%99.user.js
@@ -23,6 +23,10 @@
 
 (function () {
     "use strict";
+
+    // ====== 立即劫持 confirm（必须在页面脚本执行前，否则页面已缓存原始 confirm） ======
+    const _originalConfirm = window.confirm;
+    window.confirm = () => true;
 
     // ==================== 配置（默认值） ====================
     const DEFAULTS = {
@@ -247,26 +251,9 @@
         return { success: true, commentUsed: t.length >= 1 ? t[0].value : "" };
     }
 
-    /** 拦截 window.confirm，自动返回 true，持续到页面跳转 */
-    let _confirmHijackCleanup = null;
+    /** confirm 已在脚本加载时全局劫持，此函数仅作保活 */
     function hijackConfirm() {
-        if (_confirmHijackCleanup) return; // 已在劫持中，无需重复
-        const originalConfirm = window.confirm;
-        window.confirm = () => true;
-        // 定时保活，防止页面异步恢复
-        const handler = setInterval(() => {
-            if (window.confirm !== originalConfirm) return;
-            window.confirm = () => true;
-        }, 200);
-        // 页面离开时清理
-        const cleanup = () => {
-            clearInterval(handler);
-            window.confirm = originalConfirm;
-            window.removeEventListener('beforeunload', cleanup);
-            _confirmHijackCleanup = null;
-        };
-        window.addEventListener('beforeunload', cleanup);
-        _confirmHijackCleanup = cleanup;
+        window.confirm = () => true; // 确保仍在劫持中
     }
 
     function clickSubmit() {
@@ -863,10 +850,10 @@
         setTimeout(() => div.remove(), 5000);
     }
 
-    if (document.readyState === "complete") {
-        init();
+    if (document.readyState === "loading") {
+        document.addEventListener("DOMContentLoaded", init);
     } else {
-        window.addEventListener("load", init);
+        init();
     }
 
     // 菜单命令
