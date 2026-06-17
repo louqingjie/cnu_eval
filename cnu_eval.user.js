@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.4
+// @version      2.5
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -413,6 +413,7 @@
     // ==================== 列表页面 - 批量面板 ====================
 
     function createBatchPanel() {
+        if (document.getElementById("cnu-panel")) return; // 防重复
         const links = getPendingLinks();
         const panel = document.createElement("div");
         panel.id = "cnu-panel";
@@ -684,6 +685,7 @@
 
     /** 首页：直接显示完整的评教配置面板 */
     function createHomePanel() {
+        if (document.getElementById("cnu-panel")) return; // 防重复
         const panel = document.createElement("div");
         panel.id = "cnu-panel";
         const cfg = loadConfig();
