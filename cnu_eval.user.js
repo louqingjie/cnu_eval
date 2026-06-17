@@ -27,7 +27,7 @@
     // ====== 立即劫持 confirm（Object.defineProperty 锁定，无法被覆盖） ======
     Object.defineProperty(window, "confirm", {
         get: () => () => true,
-        set: () => {},
+        set: () => { },
         configurable: true,
         enumerable: true,
     });
