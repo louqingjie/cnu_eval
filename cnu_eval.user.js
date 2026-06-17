@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         首都师范大学 量化评教 自动评教
 // @namespace    https://github.com/louqingjie/cnu_eval
-// @version      2.9
+// @version      2.10
 // @description  一键自动完成首都师范大学量化评教，支持自定义分数、随机评语池，全自动批量处理
 // @author       louqingjie
 // @license      MIT
@@ -414,6 +414,8 @@
 
     function createBatchPanel() {
         const links = getPendingLinks();
+        const cfg = loadConfig();
+        const pool = cfg.commentPool || DEFAULTS.commentPool;
         const panel = document.createElement("div");
         panel.id = "cnu-panel";
         panel.innerHTML = `
@@ -457,7 +459,7 @@
                 <input type="checkbox" id="cnu-s-random">
                 <label for="cnu-s-random">随机评语</label>
                 <span id="cnu-pool-count" style="font-size:11px;color:#999;cursor:pointer;"
-                      title="点击管理评语池">📝 ${cfg.commentPool?.length || 10}条</span>
+                      title="点击管理评语池">📝 ${pool.length}条</span>
             </div>
             <button class="btn btn-primary" id="cnu-start-btn">
                 🚀 开始批量评教 (${links.length})
@@ -470,7 +472,6 @@
         document.body.appendChild(panel);
 
         // 恢复配置
-        const cfg = loadConfig();
         const teachSel = document.getElementById("cnu-s-teach");
         const diffSel = document.getElementById("cnu-s-diff");
         const satSel = document.getElementById("cnu-s-sat");
